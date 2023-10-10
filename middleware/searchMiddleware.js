@@ -6,7 +6,7 @@ async function getAnalyticData(url){
     let {data} = await axios.get(url, 
     {
         headers: {
-        'x-hasura-admin-secret': '32qR4KmXOIpsGPQKMqEJHGJS27G5s7HdSKO3gdtQd2kv5e852SiYwWNfxkZOBuQ6'
+            'x-hasura-admin-secret': '32qR4KmXOIpsGPQKMqEJHGJS27G5s7HdSKO3gdtQd2kv5e852SiYwWNfxkZOBuQ6'
         }
     });
     return data;

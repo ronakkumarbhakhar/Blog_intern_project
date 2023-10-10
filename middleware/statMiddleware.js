@@ -33,27 +33,30 @@ let containsPrivacy=function(d){
 exports.statmiddleware=async function(req,res,next){
     // try catch finally used for error handling
     try{
-        let getAnalyticDataMemoize=_.memoize(getAnalyticData,resolver); //memoization is done with help of _.memoize() method of lodash
+        //memoization is done with help of _.memoize() method of lodash
+        let getAnalyticDataMemoize=_.memoize(getAnalyticData,resolver); 
         let data= await getAnalyticDataMemoize('https://intent-kit-16.hasura.app/api/rest/blogs');
-
         data=data.blogs;
 
-        // creating a key value pair named titleSize so that data can be sorted in asccending order of title length
-        _.forEach(data,function(obj){obj.titleSize=_.size(obj.title)})
-
-        // sorting the collection
-        data=_.sortBy(data,function(d){return d.titleSize});
+        // sorting the collection and creating a key value pair named titleSize so that data can be sorted in asccending order of title length
+        data=_.sortBy(data,function(obj){obj.titleSize=_.size(obj.title); return obj.titleSize});
 
         // result object used for storing all analysis data
         let result={};
 
-        result.count=_.size(data); //total number of blog 
-        result.longestTitle=data[result.count-1]; // log with longest title
-        result.containsPrivacy=_.filter(data, containsPrivacy); // all blogs that contain Privacy or privacy in title
-        result.unique=_.uniqBy(data,'title');// all blogs with unique titles
+        //total number of blog 
+        result.totalBlogs=_.size(data); 
+         // longest title
+        result.longestTitle=data[result.totalBlogs-1].title;
+        // all blogs that contain Privacy or privacy in title
+        result.containsPrivacy=_.size(_.filter(data, containsPrivacy)); 
+        // all unique blog titles and removing titleSize from all blogs as it is no longer required
+        let uniqueTitles=[];
+        _.forEach(data,function(obj){uniqueTitles.push(obj.title);delete obj.titleSize;});
+        result.uniqueTitles=_.uniq(uniqueTitles);
 
-        _.forEach(data,function(obj){delete obj.titleSize}) // removing titleSize from all blogs as it is no longer required
-        req.result=result; // adding data to req
+        // adding data to req
+        req.result=result; 
     }catch(error){
         let result={};
         result.error=error;
